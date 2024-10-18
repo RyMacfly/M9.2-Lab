@@ -1,5 +1,4 @@
 // set up canvas
-
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 
@@ -13,15 +12,14 @@ ballCountDisplay.textContent = ballCount; // Display initial ball count
 const timerDisplay = document.getElementById("timer"); // Element to display the timer
 let elapsedTime = 0; // Timer starts at 0
 let timerActive = true; // To track if the timer is running
+let gameOver = false; // To track when the game is over
 
 // function to generate random number
-
 function random(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 // function to generate random RGB color value
-
 function randomRGB() {
   return `rgb(${random(0, 255)},${random(0, 255)},${random(0, 255)})`;
 }
@@ -139,10 +137,12 @@ class EvilCircle extends Shape {
           this.size += 5;
           this.velX *= 0.95;
           this.velY *= 0.95;
-        }
 
-        if (ballCount === 0) {
-          timerActive = false;
+          // Stop timer and trigger game over when ball count reaches zero
+          if (ballCount === 0) {
+            timerActive = false;
+            gameOver = true; // Mark game as over
+          }
         }
       }
     }
@@ -183,20 +183,26 @@ window.addEventListener('keyup', (e) => {
 
 // Handle multiple key presses for movement
 function moveEvilCircle() {
-  if (keys['a']) {
+  // Move left
+  if (keys['a'] || keys['ArrowLeft']) {
     evilCircle.x -= evilCircle.velX;
   }
-  if (keys['d']) {
+  // Move right
+  if (keys['d'] || keys['ArrowRight']) {
     evilCircle.x += evilCircle.velX;
   }
-  if (keys['w']) {
+  // Move up
+  if (keys['w'] || keys['ArrowUp']) {
     evilCircle.y -= evilCircle.velY;
   }
-  if (keys['s']) {
+  // Move down
+  if (keys['s'] || keys['ArrowDown']) {
     evilCircle.y += evilCircle.velY;
   }
 }
 
+
+// Timer function to update and display the elapsed time
 function updateTimer() {
   if (timerActive) {
     elapsedTime += 0.016; // Incrementing timer by ~16ms (assuming 60fps)
@@ -204,28 +210,45 @@ function updateTimer() {
   }
 }
 
+// Function to display the "You Win" game over screen
+function displayGameOver() {
+  ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.fillStyle = "white";
+  ctx.font = "48px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("You Win!", width / 2, height / 2 - 20);
+
+  ctx.font = "32px sans-serif";
+  ctx.fillText(`Time Taken: ${elapsedTime.toFixed(2)}s`, width / 2, height / 2 + 40);
+}
+
 function loop() {
   ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
   ctx.fillRect(0, 0, width, height);
 
-  moveEvilCircle();
+  if (!gameOver) {
+    moveEvilCircle();
 
-  for (const ball of balls) {
-    if (ball.exists) { // Only update balls that exist
-      ball.draw();
-      ball.update();
-      ball.collisionDetect();
+    for (const ball of balls) {
+      if (ball.exists) { // Only update balls that exist
+        ball.draw();
+        ball.update();
+        ball.collisionDetect();
+      }
     }
+
+    evilCircle.draw(); // Draw the evil circle
+    evilCircle.checkBounds(); // Check boundaries for the evil circle
+    evilCircle.collisionDetect(); // Check for collisions with the evil circle
+
+    updateTimer(); // Update the timer
+
+    requestAnimationFrame(loop); // Continue the animation loop
+  } else {
+    displayGameOver(); // Display game over screen if the game is over
   }
-
-  evilCircle.draw(); // Draw the evil circle
-  evilCircle.checkBounds(); // Check boundaries for the evil circle
-  evilCircle.collisionDetect(); // Check for collisions with the evil circle
-
-  updateTimer();
-
-  requestAnimationFrame(loop); // Continue the animation loop
 }
-
 
 loop();
