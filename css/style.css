@@ -35,3 +35,11 @@ p {
   right: 5px;
   color: #aaa;
 }
+
+#timer {
+  position: absolute;
+  margin: 0;
+  top: 55px;
+  right: 5px;
+  color: #aaa;
+}

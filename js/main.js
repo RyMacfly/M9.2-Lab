@@ -10,6 +10,10 @@ const ballCountDisplay = document.getElementById("ballCount");
 let ballCount = 25; // Start with 25 balls
 ballCountDisplay.textContent = ballCount; // Display initial ball count
 
+const timerDisplay = document.getElementById("timer"); // Element to display the timer
+let elapsedTime = 0; // Timer starts at 0
+let timerActive = true; // To track if the timer is running
+
 // function to generate random number
 
 function random(min, max) {
@@ -90,27 +94,9 @@ class Ball extends Shape {
 
 class EvilCircle extends Shape {
   constructor(x, y) {
-    super(x, y, 20, 20); // Hardcoded velX and velY values
+    super(x, y, 15, 15); // Hardcoded velX and velY values
     this.color = 'white';
     this.size = 10;
-
-    // Keyboard movement
-    window.addEventListener("keydown", (e) => {
-      switch (e.key) {
-        case "a":
-          this.x -= this.velX;
-          break;
-        case "d":
-          this.x += this.velX;
-          break;
-        case "w":
-          this.y -= this.velY;
-          break;
-        case "s":
-          this.y += this.velY;
-          break;
-      }
-    });
   }
 
   draw() {
@@ -150,6 +136,13 @@ class EvilCircle extends Shape {
           ball.exists = false;
           ballCount--; // Decrease ball count when a ball is eaten
           ballCountDisplay.textContent = ballCount;
+          this.size += 5;
+          this.velX *= 0.95;
+          this.velY *= 0.95;
+        }
+
+        if (ballCount === 0) {
+          timerActive = false;
         }
       }
     }
@@ -176,9 +169,46 @@ while (balls.length < 25) {
 
 const evilCircle = new EvilCircle(random(0, width), random(0, height));
 
+// Object to store which keys are currently pressed
+const keys = {};
+
+// Track key presses
+window.addEventListener('keydown', (e) => {
+  keys[e.key] = true;
+});
+
+window.addEventListener('keyup', (e) => {
+  keys[e.key] = false;
+});
+
+// Handle multiple key presses for movement
+function moveEvilCircle() {
+  if (keys['a']) {
+    evilCircle.x -= evilCircle.velX;
+  }
+  if (keys['d']) {
+    evilCircle.x += evilCircle.velX;
+  }
+  if (keys['w']) {
+    evilCircle.y -= evilCircle.velY;
+  }
+  if (keys['s']) {
+    evilCircle.y += evilCircle.velY;
+  }
+}
+
+function updateTimer() {
+  if (timerActive) {
+    elapsedTime += 0.016; // Incrementing timer by ~16ms (assuming 60fps)
+    timerDisplay.textContent = `Time: ${elapsedTime.toFixed(2)}s`;
+  }
+}
+
 function loop() {
   ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
   ctx.fillRect(0, 0, width, height);
+
+  moveEvilCircle();
 
   for (const ball of balls) {
     if (ball.exists) { // Only update balls that exist
@@ -191,6 +221,8 @@ function loop() {
   evilCircle.draw(); // Draw the evil circle
   evilCircle.checkBounds(); // Check boundaries for the evil circle
   evilCircle.collisionDetect(); // Check for collisions with the evil circle
+
+  updateTimer();
 
   requestAnimationFrame(loop); // Continue the animation loop
 }
