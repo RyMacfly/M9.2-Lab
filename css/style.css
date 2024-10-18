@@ -23,3 +23,15 @@ h1 {
   color: transparent;
   text-shadow: 0 0 4px white;
 }
+
+canvas {
+  display: block;
+}
+
+p {
+  position: absolute;
+  margin: 0;
+  top: 35px;
+  right: 5px;
+  color: #aaa;
+}
