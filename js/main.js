@@ -224,7 +224,7 @@ function displayGameOver() {
   ctx.fillText(`Time Taken: ${elapsedTime.toFixed(2)}s`, width / 2, height / 2 + 40);
 
   ctx.font = "32px sans-serif";
-  ctx.fillText(`Ryan's High Score: 14.58s`, width / 2, height / 2 + 80);
+  ctx.fillText(`Ryan's High Score: 13.58s`, width / 2, height / 2 + 80);
 }
 
 function loop() {
