@@ -1,4 +1,4 @@
-# M7.2 Lab 
+# M9.2 Lab 
 
 ## Overview
 This projects utilizes JavaScript OOP to create a game where an evil ball eats other balls and displays a ball counter, timer, and game over screen.
